@@ -1,7 +1,19 @@
+```code
+ ____  __  __ ____  ____  ____
+|  _ \|  \/  |  _ \|  _ \|  _ \
+| | | | |\/| | |_) | |_) | |_) |
+| |_| | |  | |  _ <|  __/|  __/
+|____/|_|  |_|_| \_\_|   |_|
+```
+
+
 # Overview
 DMR++ files generator is a cloud based activity that generate DMRPP files from netCDF4 and HDF files
+## 📖 Documentation
+- Release note [v1.0.5](https://ghrcdaac.github.io/dmrpp-generator/).
+- Release note [v1.0.4](https://ghrcdaac.github.io/dmrpp-generator/).
 
-# Pre-requisite 
+# 🔨 Pre-requisite 
 This module is meant to run within Cumulus stack. 
 If you don't have Cumulus stack deployed yet please consult [this repo](https://github.com/nasa/cumulus) 
 and follow the [documetation](https://nasa.github.io/cumulus/docs/cumulus-docs-readme) to provision it.
@@ -12,7 +24,7 @@ In [main.tf](https://github.com/nasa/cumulus-template-deploy/blob/master/cumulus
  ```code
 module "dmrpp-generator" {
   // Required parameters
-  source = "git::https://github.com/ghrcdaac/dmrpp-generator.git"
+  source = "https://github.com/ghrcdaac/dmrpp-generator/releases/download/<tag_num>/dmrpp-generator.zip"
   cluster_arn = module.cumulus.ecs_cluster_arn
   log2elasticsearch_lambda_function_arn = module.cumulus.log2elasticsearch_lambda_function_arn
   region = var.region
@@ -24,14 +36,14 @@ module "dmrpp-generator" {
   memory_reservation = 900 // default to 900
   prefix = "Cumulus stack prefix" // default Cumulus stack prefix
   desired_count = 1  // Default to 1
-  docker_image = "ghrcdaac/dmrpp-generator:latest" // Default to ghrcdaac/dmrpp-generator:latest
+  docker_image = "ghrcdaac/dmrpp-generator:<tag_num>"
 } 
 ```
 In [variables.tf](https://github.com/nasa/cumulus-template-deploy/blob/master/cumulus-tf/variables.tf) 
 file you need to define 
 ```code
 variable "dmrpp-generator-docker-image" {
-  default = "ghrcdaac/dmrpp-generator:latest"
+  default = "ghrcdaac/dmrpp-generator:<tag_num>"
 }
 ```
 Assuming you already defined the region and the prefix 
@@ -50,16 +62,7 @@ In your [workflow.tf](https://github.com/nasa/cumulus-template-deploy/blob/maste
             "files_config": "{$.meta.collection.files}",
             "fileStagingDir": "{$.meta.collection.url_path}",
             "granuleIdExtraction": "{$.meta.collection.granuleIdExtraction}",
-            "collection": "{$.meta.collection}",
-            "cumulus_message": {
-              "input": "{[$.payload.granules[*].files[*].filename]}",
-              "outputs": [
-                {
-                  "source": "{$}",
-                  "destination": "{$.payload}"
-                }
-              ]
-            }
+            "collection": "{$.meta.collection}"
           }
         }
       },
